@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Pagrindinis{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<div class="hero-section"
+     style="background: #8F6D75; color: white; padding: 80px 20px; text-align: center; border-radius: 10px; margin: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); font-family: 'Georgia', serif; border: 4px solid #734F59;">
+    <h1 style="font-size: 2.5em; margin-bottom: 20px;">Satino rožės – jūsų ypatingai progai</h1>
+    <p style="font-size: 1.2em; max-width: 900px; margin: 0 auto;">Rankų darbo satino rožės yra amžinas grožis, skirtas ypatingoms akimirkoms.</p>
+</div>
+
+<!-- Product Introduction Section -->
+<div class="product-section" style="padding: 50px 20px; text-align: center; font-family: 'Georgia', serif;">
+    <div class="card"
+         style="background-color: #ECE1E2; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1); border: 4px solid #C4B0B2; display: flex; justify-content: space-between; align-items: center;">
+        <div style="flex: 1; padding: 20px;">
+            <h2>Satino rožių puokštės</h2>
+            <p style="font-size: 1.2em; line-height: 1.6; margin: 0;">Satino rožių puokštės – elegantiškos ir amžinos dovanos. Pagamintos iš aukštos kokybės satino, jos išlaiko savo grožį ilgai. Puikiai tinka gimtadieniams, vestuvėms ir ypatingoms progoms. Pasirinkite savo mėgstamą dizainą ir spalvas, kad puokštė būtų unikali ir pritaikyta jūsų poreikiams.</p>
+        </div>
+        <div class="carousel-container" style="position: relative; max-width: 600px; overflow: hidden; flex: 1.5;">
+            <a class="prev" style="position: absolute; left: 10px; font-size: 24px; background-color: rgba(0, 0, 0, 0.5); color: white; padding: 10px; cursor: pointer; z-index: 1; transform: translateY(-50%); top: 50%;">&#10094;</a>
+            <div class="carousel" style="display: flex; transition: transform 0.5s ease;">
+                {% for image in images %}
+                    <div class="carousel-item" style="min-width: 50%; box-sizing: border-box; padding: 10px;">
+                        <div class="product-card"
+                             style="width: 100%; margin: 0; text-align: center; border: 1px solid #e0e0e0; border-radius: 5px; box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);">
+                            <img src="{{ image.image.url }}" alt="{{ image.title }}" style="width: 100%; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+                            <div style="padding: 20px;">
+                                <h3>{{ image.title }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <a class="next" style="position: absolute; right: 10px; font-size: 24px; background-color: rgba(0, 0, 0, 0.5); color: white; padding: 10px; cursor: pointer; z-index: 1; transform: translateY(-50%); top: 50%;">&#10095;</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentIndex = 0;
+
+    function showSlide(index) {
+        const slides = document.querySelectorAll('.carousel-item');
+        const totalSlides = slides.length;
+
+        if (index >= totalSlides / 2) {
+            currentIndex = 0;
+        } else if (index < 0) {
+            currentIndex = Math.ceil(totalSlides / 2) - 1;
+        } else {
+            currentIndex = index;
+        }
+
+        const newTransform = -currentIndex * 100; // 100% because each slide is 50% of the container
+        document.querySelector('.carousel').style.transform = 'translateX(' + newTransform + '%)';
+    }
+
+    document.querySelector('.prev').addEventListener('click', () => {
+        showSlide(currentIndex - 1);
+    });
+
+    document.querySelector('.next').addEventListener('click', () => {
+        showSlide(currentIndex + 1);
+    });
+
+    // Initial display
+    showSlide(currentIndex);
+</script>
+
+{% endblock %}

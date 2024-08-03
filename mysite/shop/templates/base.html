@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Satino Rožių Puokštės{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #EAD7DB;
+        }
+
+        header {
+            background-color: #8F6D75;
+            padding: 20px;
+            text-align: center;
+            color: #fff;
+            border-bottom: 4px solid #734F59;
+            position: fixed;
+            width: 100%;
+            z-index: 1500; /* Ensure header is above menu */
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        nav {
+            background-color: #8F6D75;
+            width: 200px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: -200px; /* Hide the menu initially */
+            padding-top: 80px; /* Adjust padding to be below the header */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s; /* Smooth slide effect */
+            z-index: 1000; /* Ensure the menu is below header and footer */
+        }
+
+        nav a {
+            display: block;
+            padding: 15px 20px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            background-color: #734F59;
+        }
+
+        .container {
+            margin-left: 20px; /* Adjust margin when the menu is hidden */
+            padding: 20px;
+            padding-top: 80px; /* Add padding-top to avoid content hiding behind header */
+        }
+
+        .card {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .card img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+
+        .card h2 {
+            margin-top: 10px;
+            color: #333;
+        }
+
+        .card p {
+            color: #777;
+        }
+
+        footer {
+            background-color: #8F6D75;
+            text-align: center;
+            padding: 10px;
+            color: #fff;
+            border-top: 4px solid #734F59;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1500; /* Ensure footer is above menu */
+        }
+
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #8F6D75;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 1500; /* Ensure the button is on top */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bogor</h1>
+    </header>
+    <button class="menu-toggle" onclick="toggleMenu()">☰ Menu</button>
+    <nav id="menu">
+        <a href="#">Pagrindinis</a>
+        <a href="#">Užsakymai</a>
+        <a href="#">Pirkinių krepšelis</a>
+        <a href="#">Dekoracijos</a>
+    </nav>
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <footer>
+        <p>&copy; 2024 Bogor.lt</p>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            var menu = document.getElementById('menu');
+            if (menu.style.left === '-200px') {
+                menu.style.left = '0';
+                document.querySelector('.container').style.marginLeft = '220px'; // Adjust the container margin
+            } else {
+                menu.style.left = '-200px';
+                document.querySelector('.container').style.marginLeft = '20px'; // Reset the container margin
+            }
+        }
+    </script>
+</body>
+</html>
