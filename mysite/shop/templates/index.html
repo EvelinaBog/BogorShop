@@ -12,21 +12,19 @@
 </div>
 
 <!-- Product Introduction Section -->
-<div class="product-section" style="padding: 50px 20px; text-align: center; font-family: 'Georgia', serif;">
+<div class="product-section" style="padding: 50px 20px; text-align: left; font-family: 'Georgia', serif;">
     <div class="card"
-         style="background-color: #ECE1E2; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1); border: 4px solid #C4B0B2; display: flex; justify-content: space-between; align-items: center;">
-        <div style="flex: 1; padding: 20px;">
-            <h2>Satino rožių puokštės</h2>
-            <p style="font-size: 1.2em; line-height: 1.6; margin: 0;">Satino rožių puokštės – elegantiškos ir amžinos dovanos. Pagamintos iš aukštos kokybės satino, jos išlaiko savo grožį ilgai. Puikiai tinka gimtadieniams, vestuvėms ir ypatingoms progoms. Pasirinkite savo mėgstamą dizainą ir spalvas, kad puokštė būtų unikali ir pritaikyta jūsų poreikiams.</p>
-        </div>
-        <div class="carousel-container" style="position: relative; max-width: 600px; overflow: hidden; flex: 1.5;">
-            <a class="prev" style="position: absolute; left: 10px; font-size: 24px; background-color: rgba(0, 0, 0, 0.5); color: white; padding: 10px; cursor: pointer; z-index: 1; transform: translateY(-50%); top: 50%;">&#10094;</a>
+         style="background-color: #ECE1E2; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1); border: 4px solid #C4B0B2; display: flex; justify-content: flex-start; align-items: flex-start;">
+        <div class="carousel-container" style="position: relative; max-width: 900px; overflow: hidden;">
+            {% if images|length > 6 %}
+                <a class="prev" style="position: absolute; left: 10px; font-size: 24px; background-color: rgba(0, 0, 0, 0.5); color: white; padding: 10px; cursor: pointer; z-index: 1; transform: translateY(-50%); top: 50%;">&#10094;</a>
+            {% endif %}
             <div class="carousel" style="display: flex; transition: transform 0.5s ease;">
                 {% for image in images %}
-                    <div class="carousel-item" style="min-width: 50%; box-sizing: border-box; padding: 10px;">
+                    <div class="carousel-item" style="flex: 1 0 calc(100% / min(6, {{ images|length }})); padding: 15px; box-sizing: border-box;">
                         <div class="product-card"
-                             style="width: 100%; margin: 0; text-align: center; border: 1px solid #e0e0e0; border-radius: 5px; box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);">
-                            <img src="{{ image.image.url }}" alt="{{ image.title }}" style="width: 100%; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+                             style="width: 95%; margin: 0 auto; text-align: center; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);">
+                            <img src="{{ image.image.url }}" alt="{{ image.title }}" style="width: 100%; border-top-left-radius: 8px; border-top-right-radius: 8px;">
                             <div style="padding: 20px;">
                                 <h3>{{ image.title }}</h3>
                             </div>
@@ -34,7 +32,9 @@
                     </div>
                 {% endfor %}
             </div>
-            <a class="next" style="position: absolute; right: 10px; font-size: 24px; background-color: rgba(0, 0, 0, 0.5); color: white; padding: 10px; cursor: pointer; z-index: 1; transform: translateY(-50%); top: 50%;">&#10095;</a>
+            {% if images|length > 6 %}
+                <a class="next" style="position: absolute; right: 10px; font-size: 24px; background-color: rgba(0, 0, 0, 0.5); color: white; padding: 10px; cursor: pointer; z-index: 1; transform: translateY(-50%); top: 50%;">&#10095;</a>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -44,29 +44,33 @@
 
     function showSlide(index) {
         const slides = document.querySelectorAll('.carousel-item');
-        const totalSlides = slides.length;
+        const totalSlides = slides.length / Math.min(6, slides.length);
 
-        if (index >= totalSlides / 2) {
+        if (index >= totalSlides) {
             currentIndex = 0;
         } else if (index < 0) {
-            currentIndex = Math.ceil(totalSlides / 2) - 1;
+            currentIndex = totalSlides - 1;
         } else {
             currentIndex = index;
         }
 
-        const newTransform = -currentIndex * 100; // 100% because each slide is 50% of the container
+        const newTransform = -currentIndex * 100;
         document.querySelector('.carousel').style.transform = 'translateX(' + newTransform + '%)';
     }
 
-    document.querySelector('.prev').addEventListener('click', () => {
-        showSlide(currentIndex - 1);
-    });
+    const prevButton = document.querySelector('.prev');
+    const nextButton = document.querySelector('.next');
 
-    document.querySelector('.next').addEventListener('click', () => {
-        showSlide(currentIndex + 1);
-    });
+    if (prevButton && nextButton) {
+        prevButton.addEventListener('click', () => {
+            showSlide(currentIndex - 1);
+        });
 
-    // Initial display
+        nextButton.addEventListener('click', () => {
+            showSlide(currentIndex + 1);
+        });
+    }
+
     showSlide(currentIndex);
 </script>
 

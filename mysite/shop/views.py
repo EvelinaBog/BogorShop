@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Order
+from .models import Order, Products
 from .forms import ImageUploadForm
 from .models import UploadedImage
 # Create your views here.
@@ -28,5 +28,14 @@ def index(request):
     return render(request, template_name='index.html', context=context)
 
 
-def order(request):
+def flower(request):
+    flowers = Products.objects.all()
+    color = [flower.color for flower in flowers]
+
+
+    context = {
+        'color': color,
+    }
+
+    return render(request, template_name='flowers.html', context=context)
 

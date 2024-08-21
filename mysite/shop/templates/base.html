@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Satino Rožių Puokštės{% endblock %}</title>
+    <title>Satino Rožių Puokštės</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            background-color: #EAD7DB;
+            background-color: #FFFFFF;
         }
 
         header {
@@ -21,7 +21,7 @@
             border-bottom: 4px solid #734F59;
             position: fixed;
             width: 100%;
-            z-index: 1500; /* Ensure header is above menu */
+            z-index: 1500;
         }
 
         header h1 {
@@ -31,14 +31,14 @@
         nav {
             background-color: #8F6D75;
             width: 200px;
-            height: 100vh;
             position: fixed;
             top: 0;
-            left: -200px; /* Hide the menu initially */
-            padding-top: 80px; /* Adjust padding to be below the header */
+            left: -200px;
+            height: 100%;
+            padding-top: 80px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            transition: left 0.3s; /* Smooth slide effect */
-            z-index: 1000; /* Ensure the menu is below header and footer */
+            transition: left 0.3s;
+            z-index: 1000;
         }
 
         nav a {
@@ -53,10 +53,55 @@
             background-color: #734F59;
         }
 
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-toggle {
+            background-color: #8F6D75;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: block;
+            text-align: left;
+            transition: background-color 0.3s;
+        }
+
+        .dropdown-toggle:hover {
+            background-color: #734F59;
+        }
+
+        .dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: #8F6D75;
+            color: white;
+            padding: 0;
+        }
+
+        .dropdown-content.show {
+            max-height: 300px; /* Adjust based on content size */
+            padding: 15px;
+        }
+
+        .dropdown-content a {
+            padding: 12px 0;
+            text-decoration: none;
+            display: block;
+            color: white;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #734F59;
+        }
+
         .container {
-            margin-left: 20px; /* Adjust margin when the menu is hidden */
+            margin-left: 20px;
             padding: 20px;
-            padding-top: 80px; /* Add padding-top to avoid content hiding behind header */
+            padding-top: 80px; /* Adjusted to account for fixed header */
+            transition: margin-left 0.3s; /* Smooth transition when menu is toggled */
         }
 
         .card {
@@ -92,7 +137,7 @@
             position: fixed;
             bottom: 0;
             width: 100%;
-            z-index: 1500; /* Ensure footer is above menu */
+            z-index: 1500;
         }
 
         .menu-toggle {
@@ -105,7 +150,7 @@
             padding: 10px 15px;
             cursor: pointer;
             font-size: 20px;
-            z-index: 1500; /* Ensure the button is on top */
+            z-index: 1500;
         }
     </style>
 </head>
@@ -116,12 +161,18 @@
     <button class="menu-toggle" onclick="toggleMenu()">☰ Menu</button>
     <nav id="menu">
         <a href="#">Pagrindinis</a>
-        <a href="#">Užsakymai</a>
-        <a href="#">Pirkinių krepšelis</a>
-        <a href="#">Dekoracijos</a>
+        <div class="dropdown">
+            <button class="dropdown-toggle" onclick="toggleDropdown()">Produktai</button>
+            <div class="dropdown-content" id="dropdownMenu">
+                <a href="#">Puokštės</a>
+                <a href="#">Gėlės</a>
+                <a href="#">Dovanų dėžutės</a>
+            </div>
+        </div>
     </nav>
     <div class="container">
         {% block content %}
+        <!-- Your dynamic content goes here -->
         {% endblock %}
     </div>
     <footer>
@@ -131,12 +182,31 @@
     <script>
         function toggleMenu() {
             var menu = document.getElementById('menu');
+            var container = document.querySelector('.container');
             if (menu.style.left === '-200px') {
                 menu.style.left = '0';
-                document.querySelector('.container').style.marginLeft = '220px'; // Adjust the container margin
+                container.style.marginLeft = '220px'; // Adjust margin-left to make space for the menu
             } else {
                 menu.style.left = '-200px';
-                document.querySelector('.container').style.marginLeft = '20px'; // Reset the container margin
+                container.style.marginLeft = '20px'; // Reset margin-left when menu is hidden
+            }
+        }
+
+        function toggleDropdown() {
+            var dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown if user clicks outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-toggle')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
             }
         }
     </script>
