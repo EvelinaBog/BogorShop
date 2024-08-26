@@ -29,13 +29,12 @@ def index(request):
 
 
 def flower(request):
-    flowers = Products.objects.all()
-    color = [flower.color for flower in flowers]
-
+    flowers_data = Products.objects.all()
+    first_product = flowers_data.first()  # Get the first product
 
     context = {
-        'color': color,
+        'flowers_data': flowers_data,
+        'first_product': first_product  # Pass the first product separately
     }
-
-    return render(request, template_name='flowers.html', context=context)
+    return render(request, 'flowers.html', context)
 

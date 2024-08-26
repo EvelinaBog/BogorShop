@@ -13,7 +13,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 class ProductsAdmin(admin.ModelAdmin):
-    list_display = ('color', 'remaining', 'price')
+    list_display = ('color', 'remaining', 'price', 'image', 'image_upload')
 
 
 class DecorationAdmin(admin.ModelAdmin):

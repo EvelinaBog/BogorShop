@@ -1,18 +1,66 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Pagrindinis{% endblock %}
 
+<style>
+    /* Your existing styles */
+</style>
+
 {% block content %}
-<h1 class="my-4">Flowers</h1>
-<div class="card shadow-sm mb-4">
-    <div class="card-body">
-        <ul class="list-unstyled">
-            {% for flower in flower.color_set.all %}
-            <li style=" text-align: center">{{ flowers.color }}</li>
-            {% endfor %}
-        </ul>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var thumbnails = document.querySelectorAll('.color-thumbnail');
+        thumbnails.forEach(function(thumbnail) {
+            thumbnail.addEventListener('click', function() {
+                var imageUrl = this.dataset.imageUpload || this.src;
+                changeImage(imageUrl);
+            });
+        });
+    });
+
+    function changeImage(imageUrl) {
+        console.log('Changing image to:', imageUrl); // Debugging line
+        var selectedImage = document.getElementById('selected-image');
+        if (selectedImage) {
+            selectedImage.src = imageUrl;
+        } else {
+            console.log('Selected image element not found'); // Debugging line
+        }
+    }
+</script>
+
+<div class="container my-4">
+    <h1 class="my-4 text-center">Product Colors</h1>
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div id="main-image" class="text-center mb-4">
+                <!-- Use image by default -->
+                <img id="selected-image"
+                     src="{{ first_product.image_upload.url }}"  <!-- Use image_upload as the default -->
+                     class="img-fluid"
+                     alt="Selected Color">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="color-thumbnails">
+                        {% for product in flowers_data %}
+                        <div class="thumbnail-container">
+                            <img src="{{ product.image.url }}"
+                                 class="color-thumbnail"
+                                 data-image-upload="{% if product.image_upload %}{{ product.image_upload.url }}{% else %}{{ product.image.url }}{% endif %}"
+                                 alt="{{ product.color }}">
+                            <p class="color-label">{{ product.color }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-
 {% endblock %}

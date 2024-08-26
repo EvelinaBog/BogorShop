@@ -1,14 +1,48 @@
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.validators import RegexValidator
 from django.db import models
+from .validators import validate_image_size
+from io import BytesIO as io
+from PIL import Image as PilImage
+from .validators import validate_image_size, validate_image_upload_size
+
 
 # Create your models here.
+
+
+def resize_image(image, size=(1080, 1080)):
+    img = PilImage.open(image)
+    original_size = img.size
+    img.thumbnail(size, PilImage.ANTIALIAS)
+    resized_size = img.size
+
+    print(f"Original size: {original_size}, Resized size: {resized_size}")
+
+    img_io = io()
+    img.save(img_io, format='JPEG', quality=50)  # Adjust quality as needed
+    img_io.seek(0)  # Rewind the file pointer
+
+    img_file = InMemoryUploadedFile(
+        img_io,
+        'ImageField',
+        image.name,
+        'image/jpeg',
+        img_io.getbuffer().nbytes,
+        None
+    )
+    print(f"File size after resize: {img_file.size} bytes")
+    return img_file
 
 
 class Products(models.Model):
     color = models.CharField(verbose_name='Color', max_length=20)
     remaining = models.FloatField(verbose_name='Remaining', default=0)
     price = models.FloatField(verbose_name='Price', default=1.30)
+    image = models.ImageField(upload_to='flowers/', validators=[validate_image_size])
+    image_upload = models.ImageField(upload_to='bouquets/', blank=True, null=True,
+                                     validators=[validate_image_upload_size])
 
     def __str__(self):
         return f'{self.color}'
@@ -16,6 +50,18 @@ class Products(models.Model):
     def update_remaining(self, roses_qty):
         self.remaining -= roses_qty
         return self.save()
+
+    def save(self, *args, **kwargs):
+        if self.image and hasattr(self.image, 'file'):
+            # Resize main image
+            self.image = resize_image(self.image, size=(70, 70))
+
+        if self.image_upload and hasattr(self.image_upload, 'file'):
+            # Resize upload image
+            self.image_upload = resize_image(self.image_upload, size=(900, 900))
+
+        # Ensure this line is called to save all the fields including 'color'
+        super().save(*args, **kwargs)
 
 
 class Decorations(models.Model):
@@ -80,6 +126,7 @@ class PhoneModel(models.Model):
 
     def __str__(self):
         return self.phone_number
+
 
 class UploadedImage(models.Model):
     title = models.CharField(max_length=100)
