@@ -35,10 +35,11 @@
     <div class="row mb-4">
         <div class="col-md-12">
             <div id="main-image" class="text-center mb-4">
-                <!-- Use image by default -->
+                <!-- Use image_upload by default if available -->
                 <img id="selected-image"
-                     src="{{ first_product.image_upload.url }}"  <!-- Use image_upload as the default -->
+                     src="{% if first_product.image_upload %}{{ first_product.image_upload.url }}{% else %}{{ first_product.image.url }}{% endif %}"
                      class="img-fluid"
+                     style="width: 400px; height: 500px;"
                      alt="Selected Color">
             </div>
         </div>
@@ -47,12 +48,13 @@
         <div class="col-md-12">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <div class="color-thumbnails">
+                    <div class="color-thumbnails d-flex flex-wrap">
                         {% for product in flowers_data %}
-                        <div class="thumbnail-container">
+                        <div class="thumbnail-container" style="margin: 5px;">
                             <img src="{{ product.image.url }}"
                                  class="color-thumbnail"
                                  data-image-upload="{% if product.image_upload %}{{ product.image_upload.url }}{% else %}{{ product.image.url }}{% endif %}"
+                                 style="max-width: 100px; height: auto; cursor: pointer;"
                                  alt="{{ product.color }}">
                             <p class="color-label">{{ product.color }}</p>
                         </div>

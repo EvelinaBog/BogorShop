@@ -7,6 +7,7 @@ from .validators import validate_image_size
 from io import BytesIO as io
 from PIL import Image as PilImage
 from .validators import validate_image_size, validate_image_upload_size
+from PIL import Image
 
 
 # Create your models here.
@@ -15,7 +16,12 @@ from .validators import validate_image_size, validate_image_upload_size
 def resize_image(image, size=(1080, 1080)):
     img = PilImage.open(image)
     original_size = img.size
-    img.thumbnail(size, PilImage.ANTIALIAS)
+
+    # Convert to RGB if the image has an alpha channel
+    if img.mode == 'RGBA':
+        img = img.convert('RGB')
+
+    img.thumbnail(size, PilImage.Resampling.LANCZOS)
     resized_size = img.size
 
     print(f"Original size: {original_size}, Resized size: {resized_size}")
@@ -40,9 +46,8 @@ class Products(models.Model):
     color = models.CharField(verbose_name='Color', max_length=20)
     remaining = models.FloatField(verbose_name='Remaining', default=0)
     price = models.FloatField(verbose_name='Price', default=1.30)
-    image = models.ImageField(upload_to='flowers/', validators=[validate_image_size])
-    image_upload = models.ImageField(upload_to='bouquets/', blank=True, null=True,
-                                     validators=[validate_image_upload_size])
+    image = models.ImageField(upload_to='flowers/')
+    image_upload = models.ImageField(upload_to='bouquets/', blank=True, null=True)
 
     def __str__(self):
         return f'{self.color}'
@@ -52,15 +57,15 @@ class Products(models.Model):
         return self.save()
 
     def save(self, *args, **kwargs):
+        # Resize main image if it exceeds 70x70 pixels
         if self.image and hasattr(self.image, 'file'):
-            # Resize main image
             self.image = resize_image(self.image, size=(70, 70))
 
+        # Resize uploaded image if it exceeds 900x900 pixels
         if self.image_upload and hasattr(self.image_upload, 'file'):
-            # Resize upload image
             self.image_upload = resize_image(self.image_upload, size=(900, 900))
 
-        # Ensure this line is called to save all the fields including 'color'
+        # Save the instance
         super().save(*args, **kwargs)
 
 
