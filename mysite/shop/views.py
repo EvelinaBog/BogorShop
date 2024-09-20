@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Order, Products
 from .forms import ImageUploadForm
 from .models import UploadedImage
@@ -37,4 +37,17 @@ def flower(request):
         'first_product': first_product  # Pass the first product separately
     }
     return render(request, 'flowers.html', context)
+
+
+def order_products(request, product_id):
+    product = get_object_or_404(Products, id=product_id)
+    form = AddToCartForm()  # Create the form instance
+
+    if request.method == 'POST':
+        form = AddToCartForm(request.POST)
+        if form.is_valid():
+            quantity = form.cleaned_data['quantity']
+            # Add your logic to handle adding the product to the cart here
+
+    return render(request, 'flowers.html', {'form': form, 'product': product})
 

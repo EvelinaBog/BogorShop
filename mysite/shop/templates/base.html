@@ -12,6 +12,8 @@
             padding: 0;
             box-sizing: border-box;
             background-color: #FFFFFF;
+            width: 100%;
+            overflow-x: hidden;
         }
 
         header {
@@ -20,7 +22,6 @@
             text-align: center;
             color: #fff;
             border-bottom: 4px solid #734F59;
-            position: fixed;
             width: 100%;
             z-index: 1500;
         }
@@ -150,10 +151,9 @@ nav a:hover,
         footer {
             background-color: #8F6D75;
             text-align: center;
-            padding: 10px;
+            padding: 20px;
             color: #fff;
             border-top: 4px solid #734F59;
-            position: fixed;
             bottom: 0;
             width: 100%;
             z-index: 1500;
@@ -179,9 +179,10 @@ nav a:hover,
 </header>
 <button class="menu-toggle" onclick="toggleMenu()">☰ Menu</button>
 <nav id="menu">
-    <a href="#">Pagrindinis</a>
+    <a href="{% url 'index' %}">Pagrindinis</a>
     <div class="dropdown">
-        <button class="dropdown-toggle" onclick="toggleDropdown()">Produktai <i id="caret-icon" class="bi bi-caret-down"></i></button>
+        <button class="dropdown-toggle" onclick="toggleDropdown()">Produktai <i id="caret-icon"
+                                                                                class="bi bi-caret-down"></i></button>
         <div class="dropdown-content" id="dropdownMenu">
             <a href="{% url 'flowers' %}">Puokštės</a>
             <a href="#">Gėlės</a>

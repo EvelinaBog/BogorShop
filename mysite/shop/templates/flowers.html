@@ -4,65 +4,180 @@
 {% block title %}Pagrindinis{% endblock %}
 
 <style>
-    /* Your existing styles */
+    body {
+        background-color: #f9f9f9;
+        font-family: Arial, sans-serif;
+        color: #333;
+
+    }
+
+    .container {
+        max-width: 1200px;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: #2c3e50;
+    }
+
+    #main-image {
+        border: 2px solid #ECE1E2;
+        border-radius: 10px;
+        padding: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    #selected-image {
+        border-radius: 10px;
+        transition: transform 0.2s;
+    }
+
+    #selected-image:hover {
+        transform: scale(1.05);
+    }
+
+    #selected-color {
+    margin-top: 10px;
+    margin-bottom: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #734F59;
+    }
+
+
+    .color-thumbnails {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .thumbnail-container {
+        margin: 10px;
+        text-align: center;
+        transition: transform 0.2s;
+    }
+
+    .thumbnail-container:hover {
+        transform: scale(1.1);
+    }
+
+    .color-thumbnail {
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .color-label {
+        margin-top: 5px;
+        font-weight: bold;
+        color: #34495e;
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .card-body {
+        padding: 10px;
+        background-color: #ECE1E2 !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
 </style>
 
 {% block content %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var thumbnails = document.querySelectorAll('.color-thumbnail');
+        var thumbnails = document.querySelectorAll('.color-thumbnail');  // Select all thumbnails
+
         thumbnails.forEach(function(thumbnail) {
             thumbnail.addEventListener('click', function() {
-                var imageUrl = this.dataset.imageUpload || this.src;
-                changeImage(imageUrl);
+                var imageUrl = this.dataset.imageUpload || this.src;  // Get the image URL
+                var productColor = this.dataset.color;  // Get the color from the data-color attribute
+                changeImage(imageUrl, productColor);  // Pass both image URL and color
             });
         });
     });
 
-    function changeImage(imageUrl) {
-        console.log('Changing image to:', imageUrl); // Debugging line
-        var selectedImage = document.getElementById('selected-image');
+    function changeImage(imageUrl, productColor) {
+        var selectedImage = document.getElementById('selected-image');  // Main image element
+        var selectedColor = document.getElementById('selected-color');  // Color label element
+
+        // Update the image source
         if (selectedImage) {
             selectedImage.src = imageUrl;
-        } else {
-            console.log('Selected image element not found'); // Debugging line
+        }
+
+        // Update the displayed color
+        if (selectedColor) {
+            selectedColor.textContent = productColor;  // Set the color text
         }
     }
-</script>
 
-<div class="container my-4">
-    <h1 class="my-4 text-center">Product Colors</h1>
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div id="main-image" class="text-center mb-4">
-                <!-- Use image_upload by default if available -->
+
+</script>
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card-body"
+             style="position: relative; background-color: #ECE1E2; padding: 20px; box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1); border: 4px solid #C4B0B2; display: flex; justify-content: flex-start; align-items: flex-start;">
+            <div id="main-image" class="text-center mb-4"
+                 style="overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); margin-right: 40px;">
                 <img id="selected-image"
                      src="{% if first_product.image_upload %}{{ first_product.image_upload.url }}{% else %}{{ first_product.image.url }}{% endif %}"
                      class="img-fluid"
                      style="width: 400px; height: 500px;"
                      alt="Selected Color">
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="color-thumbnails d-flex flex-wrap">
-                        {% for product in flowers_data %}
-                        <div class="thumbnail-container" style="margin: 5px;">
-                            <img src="{{ product.image.url }}"
-                                 class="color-thumbnail"
-                                 data-image-upload="{% if product.image_upload %}{{ product.image_upload.url }}{% else %}{{ product.image.url }}{% endif %}"
-                                 style="max-width: 100px; height: auto; cursor: pointer;"
-                                 alt="{{ product.color }}">
-                            <p class="color-label">{{ product.color }}</p>
-                        </div>
-                        {% endfor %}
-                    </div>
+                <div id="selected-color"
+                     style="text-align: center; margin-top: 10px; font-size: 1.2rem; font-weight: bold; color: #734F59;">
+                    {{ first_product.color }}
                 </div>
             </div>
+
+            <form method="POST" action="#">
+                {% csrf_token %}
+                <div class="mt-4">
+                    <div class="card shadow-sm" style="background-color: #ECE1E2;">
+                        <div class="card-body">
+                            <div class="col-md-12">
+                                <div class="thumbnail-container"
+                                     style="text-align: center; margin-top: 5px; position: relative;">Vienos rožės kaina
+                                    1.30€
+                                </div>
+
+                                <div class="color-thumbnails"
+                                     style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                                    {% for product in flowers_data %}
+                                    <div class="thumbnail-container" style="text-align: center; margin-top: 20px;">
+                                        <img src="{{ product.image.url }}"
+                                             class="color-thumbnail"
+                                             data-image-upload="{% if product.image_upload %}{{ product.image_upload.url }}{% else %}{{ product.image.url }}{% endif %}"
+                                             data-color="{{ product.color }}" style="max-width: 70px; height: 70px;"
+                                             alt="{{ product.color }}">
+                                        <p><input type="number" name="quantities[{{ product.id }}]" min="0" max="100"
+                                                  value="0" style="width: 40px;"></p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn-add-to-cart rounded-pill"
+                        style="position: absolute; bottom: 10px; right: 10px;
+                                background-color: #C4B0B2; color: #734F59;
+                                padding: 10px 20px; border: 2px solid #734F59;
+                                border-radius: 50px;">
+                    <i class="bi bi-bag-plus-fill" style="margin-right: 5px; color: #734F59;"></i>Add to Cart
+                </button>
+            </form>
         </div>
+
     </div>
 </div>
+
+
 {% endblock %}

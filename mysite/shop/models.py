@@ -27,7 +27,7 @@ def resize_image(image, size=(1080, 1080)):
     print(f"Original size: {original_size}, Resized size: {resized_size}")
 
     img_io = io()
-    img.save(img_io, format='JPEG', quality=50)  # Adjust quality as needed
+    img.save(img_io, format='PNG', quality=50)  # Adjust quality as needed
     img_io.seek(0)  # Rewind the file pointer
 
     img_file = InMemoryUploadedFile(
