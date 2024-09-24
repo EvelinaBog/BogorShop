@@ -17,7 +17,7 @@ class ProductsAdmin(admin.ModelAdmin):
 
 
 class DecorationAdmin(admin.ModelAdmin):
-    list_display = ('type', 'remaining', 'price')
+    list_display = ('type', 'remaining', 'price', 'deco_img', 'deco_img_upload')
 
 
 class WrappingPaperAdmin(admin.ModelAdmin):

@@ -4,10 +4,10 @@ from .models import Order, WrappingPaper, Products, Decorations
 from django.db.models.signals import post_save
 
 
-@receiver(post_save, sender=Products)
+@receiver(post_save, sender=Order)  # update this line
 def update_product_remaining(sender, instance, created, **kwargs):
     if created:
-        product = instance.roses
+        product = instance.roses  # Get the product instance from the Order
         product.update_remaining(instance.roses_qty)
 
 

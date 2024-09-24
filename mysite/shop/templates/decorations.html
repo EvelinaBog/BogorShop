@@ -127,37 +127,35 @@
             <div id="main-image" class="text-center mb-4"
                  style="overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); margin-right: 40px;">
                 <img id="selected-image"
-                     src="{% if first_product.image_upload %}{{ first_product.image_upload.url }}{% else %}{{ first_product.image.url }}{% endif %}"
+                     src="{% if first_dec.deco_img_upload %}{{ first_dec.deco_img_upload.url }}{% else %}{{ first_dec.deco_img.url }}{% endif %}"
                      class="img-fluid"
-                     style="width: 400px; height: 500px;"
+                     style="width: 500px; height: 400px;"
                      alt="Selected Color">
                 <div id="selected-color"
                      style="text-align: center; margin-top: 10px; font-size: 1.2rem; font-weight: bold; color: #734F59;">
-                    {{ first_product.color }}
+                    {{ first_dec.type }}
                 </div>
             </div>
 
-            <form method="POST" action="{% url 'cart' %}">
+            <form method="POST" action="#">
                 {% csrf_token %}
                 <div class="mt-4">
                     <div class="card shadow-sm" style="background-color: #ECE1E2;">
                         <div class="card-body">
                             <div class="col-md-12">
-                                <div class="thumbnail-container"
-                                     style="text-align: center; margin-top: 5px; position: relative;">Vienos rožės kaina
-                                    1.30€
-                                </div>
 
                                 <div class="color-thumbnails"
                                      style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
-                                    {% for product in flowers_data %}
+                                    {% for decoration in dec_data %}
                                     <div class="thumbnail-container" style="text-align: center; margin-top: 20px;">
-                                        <img src="{{ product.image.url }}"
+                                        <img src="{{ decoration.deco_img.url }}"
                                              class="color-thumbnail"
-                                             data-image-upload="{% if product.image_upload %}{{ product.image_upload.url }}{% else %}{{ product.image.url }}{% endif %}"
-                                             data-color="{{ product.color }}" style="max-width: 70px; height: 70px;"
-                                             alt="{{ product.color }}">
-                                        <p><input type="number" name="quantities[{{ product.id }}]" min="0" max="100"
+                                             data-image-upload="{% if decoration.deco_img_upload %}{{ decoration.deco_img_upload.url }}{% else %}{{ decoration.deco_img.url }}{% endif %}"
+                                             data-color="{{ decoration.type }}"
+                                             data-type="{{ decoration.type }}"
+                                        style="max-width: 70px; height: 70px;"
+                                        alt="{{ decoration.type }}">
+                                        <p><input type="number" name="quantities[{{ decoration.id }}]" min="0" max="100"
                                                   value="0" style="width: 40px;"></p>
                                     </div>
                                     {% endfor %}

@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Order, Products
-from .forms import ImageUploadForm
+from .models import Order, Products, Decorations
+from .forms import ImageUploadForm, AddToCartForm
 from .models import UploadedImage
-# Create your views here.
+from django.http import JsonResponse
+import json
 
 
 def index(request):
@@ -50,4 +51,16 @@ def order_products(request, product_id):
             # Add your logic to handle adding the product to the cart here
 
     return render(request, 'flowers.html', {'form': form, 'product': product})
+
+
+def decoration(request):
+    dec_data = Decorations.objects.all()
+    first_dec = dec_data.first()  # Get the first product
+
+    context = {
+        'dec_data': dec_data,
+        'first_dec': first_dec  # Pass the first product separately
+    }
+    return render(request, 'decorations.html', context)
+
 

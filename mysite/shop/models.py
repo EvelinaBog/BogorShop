@@ -73,6 +73,8 @@ class Decorations(models.Model):
     type = models.CharField(verbose_name='Type', max_length=20)
     remaining = models.FloatField(verbose_name='Remaining', default=0)
     price = models.FloatField(verbose_name='Price', default=0.49)
+    deco_img = models.ImageField(upload_to='Decoration/')
+    deco_img_upload = models.ImageField(upload_to='Decorations/', blank=True, null=True)
 
     def __str__(self):
         return f'{self.type}'
@@ -80,6 +82,19 @@ class Decorations(models.Model):
     def update_remaining(self, decoration_qty):
         self.remaining -= decoration_qty
         return self.save()
+
+    def save(self, *args, **kwargs):
+        # Resize main image if it exceeds 70x70 pixels
+        if self.deco_img and hasattr(self.deco_img, 'file'):
+            self.image = resize_image(self.deco_img, size=(70, 70))
+
+        # Resize uploaded image if it exceeds 900x900 pixels
+        if self.deco_img_upload and hasattr(self.deco_img_upload, 'file'):
+            self.image_upload = resize_image(self.deco_img_upload, size=(900, 900))
+
+        # Save the instance
+        super().save(*args, **kwargs)
+
 
 
 class WrappingPaper(models.Model):
