@@ -137,44 +137,48 @@
                 </div>
             </div>
 
-            <form method="POST" action="{% url 'cart' %}">
-                {% csrf_token %}
-                <div class="mt-4">
-                    <div class="card shadow-sm" style="background-color: #ECE1E2;">
-                        <div class="card-body">
-                            <div class="col-md-12">
-                                <div class="thumbnail-container"
-                                     style="text-align: center; margin-top: 5px; position: relative;">Vienos rožės kaina
-                                    1.30€
-                                </div>
+            {% csrf_token %}
+            <div class="mt-4">
+                <div class="card shadow-sm" style="background-color: #ECE1E2;">
+                    <div class="card-body">
+                        <div class="col-md-12">
+                            <div class="thumbnail-container"
+                                 style="text-align: center; margin-top: 5px; position: relative;">Vienos rožės kaina
+                                1.30€
+                            </div>
 
-                                <div class="color-thumbnails"
-                                     style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
-                                    {% for product in flowers_data %}
-                                    <div class="thumbnail-container" style="text-align: center; margin-top: 20px;">
-                                        <img src="{{ product.image.url }}"
-                                             class="color-thumbnail"
-                                             data-image-upload="{% if product.image_upload %}{{ product.image_upload.url }}{% else %}{{ product.image.url }}{% endif %}"
-                                             data-color="{{ product.color }}" style="max-width: 70px; height: 70px;"
-                                             alt="{{ product.color }}">
-                                        <p><input type="number" name="quantities[{{ product.id }}]" min="0" max="100"
-                                                  value="0" style="width: 40px;"></p>
-                                    </div>
-                                    {% endfor %}
+                            <div class="color-thumbnails"
+                                 style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                                {% for product in flowers_data %}
+                                <div class="thumbnail-container" style="text-align: center; margin-top: 20px;">
+                                    <img src="{{ product.image.url }}"
+                                         class="color-thumbnail"
+                                         data-image-upload="{% if product.image_upload %}{{ product.image_upload.url }}{% else %}{{ product.image.url }}{% endif %}"
+                                         data-color="{{ product.color }}" style="max-width: 70px; height: 70px;"
+                                         alt="{{ product.color }}">
+                                    {{ form.product }}
+                                    <p><input type="number" name="quantities[{{ product.id }}]" min="0" max="100"
+                                              value="0" style="width: 40px;"></p>
+                                    <a href="#" class="buy-now-button">Buy Now</a>
+                                    <a class="buy-now-button" href="{% url 'shop:add_to_cart' product.id %}">Add to
+                                        Cart</a>
+
+
                                 </div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <button type="submit" class="btn-add-to-cart rounded-pill"
-                        style="position: absolute; bottom: 10px; right: 10px;
+            <button type="submit" class="btn-add-to-cart rounded-pill"
+                    style="position: absolute; bottom: 10px; right: 10px;
                                 background-color: #C4B0B2; color: #734F59;
                                 padding: 10px 20px; border: 2px solid #734F59;
                                 border-radius: 50px;">
-                    <i class="bi bi-bag-plus-fill" style="margin-right: 5px; color: #734F59;"></i>Add to Cart
-                </button>
-            </form>
+                <i class="bi bi-bag-plus-fill" style="margin-right: 5px; color: #734F59;"></i>Add to Cart
+            </button>
         </div>
 
     </div>

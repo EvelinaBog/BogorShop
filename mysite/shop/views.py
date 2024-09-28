@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Order, Products, Decorations
-from .forms import ImageUploadForm, AddToCartForm
+from .models import Order, Products, Decorations, CartItem
 from .models import UploadedImage
 from django.http import JsonResponse
 import json
@@ -40,19 +39,6 @@ def flower(request):
     return render(request, 'flowers.html', context)
 
 
-def order_products(request, product_id):
-    product = get_object_or_404(Products, id=product_id)
-    form = AddToCartForm()  # Create the form instance
-
-    if request.method == 'POST':
-        form = AddToCartForm(request.POST)
-        if form.is_valid():
-            quantity = form.cleaned_data['quantity']
-            # Add your logic to handle adding the product to the cart here
-
-    return render(request, 'flowers.html', {'form': form, 'product': product})
-
-
 def decoration(request):
     dec_data = Decorations.objects.all()
     first_dec = dec_data.first()  # Get the first product
@@ -62,5 +48,26 @@ def decoration(request):
         'first_dec': first_dec  # Pass the first product separately
     }
     return render(request, 'decorations.html', context)
+
+
+def view_cart(request):
+    cart_items = CartItem.object.filter(user=request.user)
+    total_price = sum(item.products.price * item.quantity for item in cart_items)
+    return render(request, 'cart.html', {'cart_items': cart_items, 'total_price': total_price})
+
+
+def add_to_cart(request, product_id):
+    product = Products.objects.get(id=product_id)
+    cart_item, created = CartItem.objects.get_or_create(product=product, user=request.user)
+    cart_item.quantity += 1
+    cart_item.save()
+    return redirect('cart:view_cart')
+
+
+def remove_from_cart(request, item_id):
+    cart_item = CartItem.objects.get(id=item_id)
+    cart_item.delete()
+    return redirect('cart:view_cart')
+
 
 

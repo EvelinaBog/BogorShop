@@ -1,43 +1,70 @@
 {% extends "base.html" %}
 
-{% block title %}Your Cart{% endblock %}
+{% block title %}Cart{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="mb-4">Your Cart</h1>
 
-    {% if cart %}
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Product Name</th>
-                    <th>Quantity</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for product_id, quantity in cart.items %}
-                    <tr>
-                        <!-- Assuming you have a way to get the product name via the ID (you can adjust based on your logic) -->
-                        <td>{{ product_id }}</td>
-                        <td>{{ quantity }}</td>
-                        <td>
-                            <form method="POST" action="{% url 'remove_from_cart' product_id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* Add CSS styles for flex container and items */
+        .product-list {
+            display: flex;
+            flex-wrap: wrap; /* Allow items to wrap to the next row if necessary */
+            justify-content: space-between; /* Space items evenly along the main axis */
+            list-style: none; /* Remove list styles */
+            padding: 0;
+        }
 
-        <div class="text-right">
-            <a href="{% url 'checkout' %}" class="btn btn-success">Proceed to Checkout</a>
-        </div>
-    {% else %}
-        <p>Your cart is empty.</p>
-        <a href="{% url 'home' %}" class="btn btn-primary">Continue Shopping</a>
-    {% endif %}
-</div>
+        .product-item {
+            
+            flex: 1; /* Grow to fill available space evenly */
+             /* Limit item width to avoid overcrowding */
+            margin: 10px; /* Add spacing between items */
+            border: 1px solid #ccc; /* Add a border for visual separation */
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* Style the "Buy Now" button */
+        .buy-now-button {
+            display: block;
+            margin-top: 10px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Your Shopping Cart</h1>
+
+    <div class="product-list">
+
+   
+
+    {% for item in cart_items %}
+    <div class="product-item">
+        <p>{{ item.product.color }} ({{ item.quantity }})</p>
+        <p>Price: ${{ item.product.price }}</p>
+        <a href="{% url 'cart:remove_from_cart' item.id %}">Remove</a>
+    </div>
+    {% empty %}
+    <p>Your cart is empty.</p>
+    {% endfor %}
+
+    </div>
+
+    <p>Total Price: ${{ total_price }}</p>
+
+    <a href="{% url 'cart:product_list' %}">Continue Shopping</a>
+
+</body>
+
 {% endblock %}

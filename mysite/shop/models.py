@@ -8,6 +8,8 @@ from io import BytesIO as io
 from PIL import Image as PilImage
 from .validators import validate_image_size, validate_image_upload_size
 from PIL import Image
+from django.contrib.auth.models import User
+import datetime
 
 
 # Create your models here.
@@ -154,3 +156,13 @@ class UploadedImage(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class CartItem(models.Model):
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    qty = models.PositiveIntegerField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    date_added = models.DateTimeField(default=datetime.datetime.now())
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.color}"

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Products, Decorations, WrappingPaper, Order, Client, PhoneModel, UploadedImage
+from .models import Products, Decorations, WrappingPaper, Order, Client, PhoneModel, UploadedImage, CartItem
 
 # Register your models here.
 
@@ -43,4 +43,5 @@ admin.site.register(WrappingPaper, WrappingPaperAdmin)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(Client, ClientAdmin)
 admin.site.register(PhoneModel, PhoneModelAdmin)
+admin.site.register(CartItem)
 

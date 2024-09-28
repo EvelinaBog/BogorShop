@@ -180,19 +180,19 @@ nav a:hover,
 </header>
 <button class="menu-toggle" onclick="toggleMenu()">☰ Menu</button>
 <nav id="menu">
-    <a href="{% url 'index' %}">Pagrindinis</a>
+    <a href="{% url 'shop:index' %}">Pagrindinis</a>
     <div class="dropdown">
         <button class="dropdown-toggle" onclick="toggleDropdown()">Produktai <i id="caret-icon"
                                                                                 class="bi bi-caret-down"></i></button>
         <div class="dropdown-content" id="dropdownMenu">
-            <a href="{% url 'flowers' %}">Rožės</a>
-            <a href="{% url 'decorations' %}">Dekoracijos</a>
+            <a href="{% url 'shop:flowers' %}">Rožės</a>
+            <a href="{% url 'shop:decorations' %}">Dekoracijos</a>
             <a href="#">Pakavimas</a>
         </div>
     </div>
 </nav>
 <nav>
-    <a href="{% url 'cart' %}">Cart ({{ request.session.cart|length }} items)</a>
+
 </nav>
 <div class="container">
     {% block content %}
