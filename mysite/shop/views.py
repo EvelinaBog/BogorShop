@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.cache import never_cache
+
 from .models import Order, Products, Decorations, CartItem
 from .models import UploadedImage
-from django.http import JsonResponse
-import json
 
 
 def index(request):
@@ -50,24 +50,72 @@ def decoration(request):
     return render(request, 'decorations.html', context)
 
 
-def view_cart(request):
-    cart_items = CartItem.object.filter(user=request.user)
-    total_price = sum(item.products.price * item.quantity for item in cart_items)
-    return render(request, 'cart.html', {'cart_items': cart_items, 'total_price': total_price})
-
-
 def add_to_cart(request, product_id):
-    product = Products.objects.get(id=product_id)
-    cart_item, created = CartItem.objects.get_or_create(product=product, user=request.user)
-    cart_item.quantity += 1
-    cart_item.save()
-    return redirect('cart:view_cart')
+    product = get_object_or_404(Products, id=product_id)
+    qty = int(request.POST.get('quantity', 1))
+
+    if request.user.is_authenticated:
+        # Logic for authenticated users
+        cart_item, created = CartItem.objects.get_or_create(product=product, user=request.user)
+        cart_item.qty += qty
+        cart_item.price = product.price  # Ensure price is updated from product
+        cart_item.save()
+    else:
+        # Logic for anonymous users
+        cart = request.session.get('cart', {})
+        if product_id in cart:
+            cart[product_id]['quantity'] += qty  # Increment quantity
+            cart[product_id]['price'] = str(product.price)  # Update price to reflect changes
+        else:
+            cart[product_id] = {
+                'quantity': qty,
+                'price': str(product.price)  # Store the price as a string
+            }
+
+        request.session['cart'] = cart  # Save updated cart back to session
+        request.session.modified = True  # Mark session as modified
+
+    return redirect('shop:view_cart')
 
 
+@never_cache
+def view_cart(request):
+    cart = request.session.get('cart', {})
+    cart_items = []
+    total_price = 0
+
+    for product_id, item in cart.items():
+        product = get_object_or_404(Products, id=product_id)  # Retrieve product info
+        qty = item['quantity']
+        item_price = product.price * qty  # Calculate the total price for this item
+        total_price += item_price
+        cart_items.append({
+            'id': product_id,
+            'color': product.color,
+            'qty': qty,
+            'price': item_price
+        })
+
+    return render(request, 'cart.html', {
+        'cart_items': cart_items,
+        'total_price': total_price
+    })
+
+
+@never_cache
 def remove_from_cart(request, item_id):
-    cart_item = CartItem.objects.get(id=item_id)
-    cart_item.delete()
-    return redirect('cart:view_cart')
+    if request.user.is_authenticated:
+        try:
+            cart_item = CartItem.objects.get(id=item_id)
+            cart_item.delete()
+        except CartItem.DoesNotExist:
+            pass
+    else:
+        cart = request.session.get('cart', {})
+        if str(item_id) in cart:
+            del cart[str(item_id)]
 
+        request.session['cart'] = cart
+        request.session.modified = True
 
-
+    return redirect('shop:view_cart')

@@ -157,11 +157,14 @@
                                          data-color="{{ product.color }}" style="max-width: 70px; height: 70px;"
                                          alt="{{ product.color }}">
                                     {{ form.product }}
-                                    <p><input type="number" name="quantities[{{ product.id }}]" min="0" max="100"
-                                              value="0" style="width: 40px;"></p>
-                                    <a href="#" class="buy-now-button">Buy Now</a>
-                                    <a class="buy-now-button" href="{% url 'shop:add_to_cart' product.id %}">Add to
-                                        Cart</a>
+                                    <form action="{% url 'shop:add_to_cart' product.id %}" method="POST">
+
+                                        {% csrf_token %}
+                                        <label for="quantity">Quantity:</label>
+                                        <input type="number" id="quantity-{{ product.id }}" name="quantity" value="1"
+                                               min="1">
+                                        <button type="submit">Add to Cart</button>
+                                    </form>
 
 
                                 </div>

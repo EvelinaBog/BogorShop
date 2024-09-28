@@ -47,7 +47,7 @@ def resize_image(image, size=(1080, 1080)):
 class Products(models.Model):
     color = models.CharField(verbose_name='Color', max_length=20)
     remaining = models.FloatField(verbose_name='Remaining', default=0)
-    price = models.FloatField(verbose_name='Price', default=1.30)
+    price = models.FloatField(verbose_name='Price', default=1.99)
     image = models.ImageField(upload_to='flowers/')
     image_upload = models.ImageField(upload_to='bouquets/', blank=True, null=True)
 
