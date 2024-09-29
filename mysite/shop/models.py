@@ -98,7 +98,6 @@ class Decorations(models.Model):
         super().save(*args, **kwargs)
 
 
-
 class WrappingPaper(models.Model):
     color = models.CharField(verbose_name='Color', max_length=20)
     remaining = models.FloatField(verbose_name='Remaining', default=0)
@@ -120,6 +119,7 @@ class Order(models.Model):
     decoration_qty = models.IntegerField(verbose_name='Decorations Quantity', default=0)
     wrappingpaper = models.ForeignKey('WrappingPaper', on_delete=models.CASCADE, null=True)
     wp_qty = models.IntegerField(verbose_name='Wrapping Paper Quantity', default=0)
+    order_comment = models.TextField(verbose_name='Order comment', blank=True, null=True)
 
     def __str__(self):
         return f'{self.client} {self.roses} {self.roses_qty} {self.decoration} {self.decoration_qty} {self.wrappingpaper} {self.decoration_qty}'
@@ -158,11 +158,19 @@ class UploadedImage(models.Model):
         return self.title
 
 
-class CartItem(models.Model):
-    product = models.ForeignKey(Products, on_delete=models.CASCADE)
-    qty = models.PositiveIntegerField(default=0)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
-    date_added = models.DateTimeField(default=datetime.datetime.now())
+class Cart(models.Model):
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+    session_key = models.CharField(max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.color}"
+        return f'Cart {self.id}'
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.quantity} x {self.product.color}'

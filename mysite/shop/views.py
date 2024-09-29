@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.cache import never_cache
 
-from .models import Order, Products, Decorations, CartItem
+from .models import Order, Products, Decorations, CartItem, Cart
 from .models import UploadedImage
+from django.utils.decorators import decorator_from_middleware
+from django.middleware.cache import CacheMiddleware
+from django.views.decorators.cache import cache_control
 
 
 def index(request):
@@ -28,6 +31,8 @@ def index(request):
     return render(request, template_name='index.html', context=context)
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@never_cache
 def flower(request):
     flowers_data = Products.objects.all()
     first_product = flowers_data.first()  # Get the first product
@@ -50,56 +55,46 @@ def decoration(request):
     return render(request, 'decorations.html', context)
 
 
-def add_to_cart(request, product_id):
-    product = get_object_or_404(Products, id=product_id)
-    qty = int(request.POST.get('quantity', 1))
-
+def get_or_create_cart(request):
     if request.user.is_authenticated:
-        # Logic for authenticated users
-        cart_item, created = CartItem.objects.get_or_create(product=product, user=request.user)
-        cart_item.qty += qty
-        cart_item.price = product.price  # Ensure price is updated from product
-        cart_item.save()
+        cart, created = Cart.objects.get_or_create(user=request.user)
     else:
-        # Logic for anonymous users
-        cart = request.session.get('cart', {})
-        if product_id in cart:
-            cart[product_id]['quantity'] += qty  # Increment quantity
-            cart[product_id]['price'] = str(product.price)  # Update price to reflect changes
-        else:
-            cart[product_id] = {
-                'quantity': qty,
-                'price': str(product.price)  # Store the price as a string
-            }
+        session_key = request.session.session_key or request.session.create()
+        cart, created = Cart.objects.get_or_create(session_key=session_key)
+    return cart
 
-        request.session['cart'] = cart  # Save updated cart back to session
-        request.session.modified = True  # Mark session as modified
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@never_cache
+def add_to_cart_bulk(request):
+    if request.method == 'POST':
+        cart = get_or_create_cart(request)
+        product_ids = request.POST.getlist('products[]')
+        quantities = request.POST.getlist('quantities[]')
+
+        for product_id, quantity in zip(product_ids, quantities):
+            product = get_object_or_404(Products, id=product_id)
+            quantity = int(quantity)
+
+            cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+            cart_item.quantity += quantity
+            cart_item.save()
 
     return redirect('shop:view_cart')
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @never_cache
 def view_cart(request):
-    cart = request.session.get('cart', {})
-    cart_items = []
-    total_price = 0
-
-    for product_id, item in cart.items():
-        product = get_object_or_404(Products, id=product_id)  # Retrieve product info
-        qty = item['quantity']
-        item_price = product.price * qty  # Calculate the total price for this item
-        total_price += item_price
-        cart_items.append({
-            'id': product_id,
-            'color': product.color,
-            'qty': qty,
-            'price': item_price
-        })
+    cart = get_or_create_cart(request)
+    cart_items = cart.items.all()
+    total_price = sum(item.product.price * item.quantity for item in cart_items)
 
     return render(request, 'cart.html', {
         'cart_items': cart_items,
-        'total_price': total_price
+        'total_price': round(total_price, 2)
     })
+
 
 
 @never_cache
@@ -119,3 +114,12 @@ def remove_from_cart(request, item_id):
         request.session.modified = True
 
     return redirect('shop:view_cart')
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip

@@ -8,7 +8,6 @@
         background-color: #f9f9f9;
         font-family: Arial, sans-serif;
         color: #333;
-
     }
 
     .container {
@@ -39,13 +38,12 @@
     }
 
     #selected-color {
-    margin-top: 10px;
-    margin-bottom: 0;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #734F59;
+        margin-top: 10px;
+        margin-bottom: 0;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #734F59;
     }
-
 
     .color-thumbnails {
         display: flex;
@@ -82,11 +80,61 @@
     }
 
     .card-body {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         padding: 10px;
         background-color: #ECE1E2 !important;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Create responsive grid columns */
+        gap: 20px; /* Space between grid items */
+        justify-items: center; /* Horizontally center items */
+        align-items: center; /* Vertically center items */
+        width: 100%; /* Full width of the container */
+        padding: 20px; /* Optional padding for the grid */
     }
 
+    .input-group {
+        max-width: 120px;
+        margin: 0 auto;
+    }
+
+    .input-group-sm .form-control {
+        height: 32px;
+        font-size: 14px;
+        width: 60px;
+    }
+
+    /* Hide the arrows for input[type=number] */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield; /* Firefox */
+    }
+
+    button[type="submit"] {
+        background-color: #734F59;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #855832;
+    }
+
+    .btn-icon {
+        padding: 0;
+        width: 30px;
+        height: 30px;
+    }
 </style>
 
 {% block content %}
@@ -96,9 +144,29 @@
 
         thumbnails.forEach(function(thumbnail) {
             thumbnail.addEventListener('click', function() {
-                var imageUrl = this.dataset.imageUpload || this.src;  // Get the image URL
+                var imageUrl = this.dataset.imageUpload || this.src;  // Get the image URL from `image_upload` or fallback to `src`
                 var productColor = this.dataset.color;  // Get the color from the data-color attribute
                 changeImage(imageUrl, productColor);  // Pass both image URL and color
+            });
+        });
+
+        // Quantity selector logic
+        var quantitySelectors = document.querySelectorAll('.quantity-selector');
+        quantitySelectors.forEach(function(selector) {
+            var minusBtn = selector.querySelector('[data-bs-step="down"]');
+            var plusBtn = selector.querySelector('[data-bs-step="up"]');
+            var quantityInput = selector.querySelector('input');
+
+            minusBtn.addEventListener('click', function() {
+                var qty = parseInt(quantityInput.value);
+                if (qty > 0) {
+                    quantityInput.value = qty - 1;
+                }
+            });
+
+            plusBtn.addEventListener('click', function() {
+                var qty = parseInt(quantityInput.value);
+                quantityInput.value = qty + 1;
             });
         });
     });
@@ -118,8 +186,8 @@
         }
     }
 
-
 </script>
+
 <div class="row mb-4">
     <div class="col-md-12">
         <div class="card-body"
@@ -137,55 +205,61 @@
                 </div>
             </div>
 
-            {% csrf_token %}
             <div class="mt-4">
-                <div class="card shadow-sm" style="background-color: #ECE1E2;">
+                <div class="card shadow-sm"
+                     style="background-color: #ECE1E2;">
                     <div class="card-body">
                         <div class="col-md-12">
                             <div class="thumbnail-container"
                                  style="text-align: center; margin-top: 5px; position: relative;">Vienos rožės kaina
-                                1.30€
+                                1.99€
                             </div>
 
-                            <div class="color-thumbnails"
-                                 style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
-                                {% for product in flowers_data %}
-                                <div class="thumbnail-container" style="text-align: center; margin-top: 20px;">
-                                    <img src="{{ product.image.url }}"
-                                         class="color-thumbnail"
-                                         data-image-upload="{% if product.image_upload %}{{ product.image_upload.url }}{% else %}{{ product.image.url }}{% endif %}"
-                                         data-color="{{ product.color }}" style="max-width: 70px; height: 70px;"
-                                         alt="{{ product.color }}">
-                                    {{ form.product }}
-                                    <form action="{% url 'shop:add_to_cart' product.id %}" method="POST">
-
-                                        {% csrf_token %}
-                                        <label for="quantity">Quantity:</label>
-                                        <input type="number" id="quantity-{{ product.id }}" name="quantity" value="1"
-                                               min="1">
-                                        <button type="submit">Add to Cart</button>
-                                    </form>
-
-
+                            <!-- Form for adding products to cart -->
+                            <form id="cart-form" method="POST" action="{% url 'shop:add_to_cart_bulk' %}">
+                                {% csrf_token %}
+                                <div class="color-thumbnails"
+                                     style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px;">
+                                    {% for product in flowers_data %}
+                                    <div class="thumbnail-container" style="text-align: center; margin-top: 20px;">
+                                        <img src="{{ product.image.url }}"
+                                             data-image-upload="{% if product.image_upload %}{{ product.image_upload.url }}{% endif %}"
+                                             alt="{{ product.color }}" class="color-thumbnail"
+                                             data-color="{{ product.color }}" style="max-width: 70px; height: 70px;">
+                                        <div class="input-group input-group-sm quantity-selector quantity-selector-sm">
+                                            <button type="button" class="btn btn-secondary btn-minus"
+                                                    data-bs-step="down">
+                                                <span>−</span>
+                                            </button>
+                                            <input type="text" id="inputQuantitySelectorSm-{{ product.id }}"
+                                                   class="form-control quantity-input"
+                                                   name="quantities[]" value="0" min="0" max="10"
+                                                   aria-live="polite" aria-label="Quantity selector">
+                                            <button type="button" class="btn btn-secondary btn-plus" data-bs-step="up">
+                                                <span>+</span>
+                                            </button>
+                                            <input type="hidden" name="products[]" value="{{ product.id }}">
+                                        </div>
+                                    </div>
+                                    {% endfor %}
                                 </div>
-                                {% endfor %}
-                            </div>
+
+                                <!-- Add to Cart button moved inside the form -->
+                                <button type="submit" class="btn-add-to-cart rounded-pill"
+                                        style="position: absolute; bottom: 10px; right: 10px;
+                                                background-color: #C4B0B2; color: #734F59;
+                                                padding: 10px 20px; border: 2px solid #734F59;
+                                                border-radius: 50px;">
+                                    <i class="bi bi-bag-plus-fill" style="margin-right: 5px; color: #734F59;"></i>Add to
+                                    Cart
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <button type="submit" class="btn-add-to-cart rounded-pill"
-                    style="position: absolute; bottom: 10px; right: 10px;
-                                background-color: #C4B0B2; color: #734F59;
-                                padding: 10px 20px; border: 2px solid #734F59;
-                                border-radius: 50px;">
-                <i class="bi bi-bag-plus-fill" style="margin-right: 5px; color: #734F59;"></i>Add to Cart
-            </button>
         </div>
-
     </div>
 </div>
-
 
 {% endblock %}
