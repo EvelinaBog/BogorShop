@@ -2,140 +2,143 @@
 {% load static %}
 
 {% block title %}Pagrindinis{% endblock %}
+<head xmlns:transform="http://www.w3.org/1999/xhtml">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
 
-<style>
-    body {
-        background-color: #f9f9f9;
-        font-family: Arial, sans-serif;
-        color: #333;
-    }
+    <style>
+        body {
+            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
 
-    .container {
-        max-width: 1200px;
-    }
+        .container {
+            max-width: 1200px;
+        }
 
-    h1 {
-        font-size: 2.5rem;
-        margin-bottom: 20px;
-        color: #2c3e50;
-    }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
 
-    #main-image {
-        border: 2px solid #ECE1E2;
-        border-radius: 10px;
-        padding: 10px;
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
+        #main-image {
+            border: 2px solid #ECE1E2;
+            border-radius: 10px;
+            padding: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
 
-    #selected-image {
-        border-radius: 10px;
-        transition: transform 0.2s;
-    }
+        #selected-image {
+            border-radius: 10px;
+            transition: transform 0.2s;
+        }
 
-    #selected-image:hover {
-        transform: scale(1.05);
-    }
+        #selected-image:hover {
+            transform: scale(1.05);
+        }
 
-    #selected-color {
-        margin-top: 10px;
-        margin-bottom: 0;
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #734F59;
-    }
+        #selected-color {
+            margin-top: 10px;
+            margin-bottom: 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #734F59;
+        }
 
-    .color-thumbnails {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
+        .color-thumbnails {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
 
-    .thumbnail-container {
-        margin: 10px;
-        text-align: center;
-        transition: transform 0.2s;
-    }
+        .thumbnail-container {
+            margin: 10px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
 
-    .thumbnail-container:hover {
-        transform: scale(1.1);
-    }
+        .thumbnail-container:hover {
+            transform: scale(1.1);
+        }
 
-    .color-thumbnail {
-        border-radius: 5px;
-        cursor: pointer;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
+        .color-thumbnail {
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
 
-    .color-label {
-        margin-top: 5px;
-        font-weight: bold;
-        color: #34495e;
-    }
+        .color-label {
+            margin-top: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
 
-    .card {
-        border: none;
-        border-radius: 10px;
-        overflow: hidden;
-    }
+        .card {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+        }
 
-    .card-body {
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 10px;
-        background-color: #ECE1E2 !important;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Create responsive grid columns */
-        gap: 20px; /* Space between grid items */
-        justify-items: center; /* Horizontally center items */
-        align-items: center; /* Vertically center items */
-        width: 100%; /* Full width of the container */
-        padding: 20px; /* Optional padding for the grid */
-    }
+        .card-body {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background-color: #ECE1E2 !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Create responsive grid columns */
+            gap: 20px; /* Space between grid items */
+            justify-items: center; /* Horizontally center items */
+            align-items: center; /* Vertically center items */
+            width: 100%; /* Full width of the container */
+            padding: 20px; /* Optional padding for the grid */
+        }
 
-    .input-group {
-        max-width: 120px;
-        margin: 0 auto;
-    }
+        .input-group {
+            max-width: 120px;
+            margin: 0 auto;
+        }
 
-    .input-group-sm .form-control {
-        height: 32px;
-        font-size: 14px;
-        width: 60px;
-    }
+        .input-group-sm .form-control {
+            height: 32px;
+            font-size: 14px;
+            width: 60px;
+        }
 
-    /* Hide the arrows for input[type=number] */
-    input[type=number]::-webkit-outer-spin-button,
-    input[type=number]::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
+        /* Hide the arrows for input[type=number] */
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
 
-    input[type=number] {
-        -moz-appearance: textfield; /* Firefox */
-    }
+        input[type=number] {
+            -moz-appearance: textfield; /* Firefox */
+        }
 
-    button[type="submit"] {
-        background-color: #734F59;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
+        button[type="submit"] {
+            background-color: #734F59;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    button[type="submit"]:hover {
-        background-color: #855832;
-    }
+        button[type="submit"]:hover {
+            background-color: #855832;
+        }
 
-    .btn-icon {
-        padding: 0;
-        width: 30px;
-        height: 30px;
-    }
-</style>
+        .btn-icon {
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+    </style>
+</head>
 
 {% block content %}
 <script>
@@ -193,7 +196,7 @@
         <div class="card-body"
              style="position: relative; background-color: #ECE1E2; padding: 20px; box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1); border: 4px solid #C4B0B2; display: flex; justify-content: flex-start; align-items: flex-start;">
             <div id="main-image" class="text-center mb-4"
-                 style="overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); margin-right: 40px;">
+                 style="overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); margin-right: 20px;">
                 <img id="selected-image"
                      src="{% if first_product.image_upload %}{{ first_product.image_upload.url }}{% else %}{{ first_product.image.url }}{% endif %}"
                      class="img-fluid"
@@ -207,41 +210,45 @@
 
             <div class="mt-4">
                 <div class="card shadow-sm"
-                     style="background-color: #ECE1E2;">
+                     style="background-color: #ECE1E2; margin-right: 20px;">
                     <div class="card-body">
                         <div class="col-md-12">
-                            <div class="thumbnail-container"
-                                 style="text-align: center; margin-top: 5px; position: relative;">Vienos rožės kaina
-                                1.99€
-                            </div>
 
                             <!-- Form for adding products to cart -->
                             <form id="cart-form" method="POST" action="{% url 'shop:add_to_cart_bulk' %}">
                                 {% csrf_token %}
                                 <div class="color-thumbnails"
-                                     style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px;">
+                                     style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
                                     {% for product in flowers_data %}
-                                    <div class="thumbnail-container" style="text-align: center; margin-top: 20px;">
+                                    <div class="thumbnail-container" style="text-align: center; margin-top: 10px;">
                                         <img src="{{ product.image.url }}"
                                              data-image-upload="{% if product.image_upload %}{{ product.image_upload.url }}{% endif %}"
                                              alt="{{ product.color }}" class="color-thumbnail"
-                                             data-color="{{ product.color }}" style="max-width: 70px; height: 70px;">
+                                             data-color="{{ product.color }}" style="max-width: 65px; height: 65px;">
                                         <div class="input-group input-group-sm quantity-selector quantity-selector-sm">
                                             <button type="button" class="btn btn-secondary btn-minus"
+                                                    style="border-top-left-radius: 4px; border-bottom-left-radius: 4px; border-right: none;"
                                                     data-bs-step="down">
                                                 <span>−</span>
                                             </button>
                                             <input type="text" id="inputQuantitySelectorSm-{{ product.id }}"
                                                    class="form-control quantity-input"
+                                                   style="border-right: none; border-left: none"
                                                    name="quantities[]" value="0" min="0" max="10"
                                                    aria-live="polite" aria-label="Quantity selector">
-                                            <button type="button" class="btn btn-secondary btn-plus" data-bs-step="up">
+                                            <button type="button" class="btn btn-secondary btn-plus"
+                                                    style="border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-left: none "
+                                                    data-bs-step="up">
                                                 <span>+</span>
                                             </button>
                                             <input type="hidden" name="products[]" value="{{ product.id }}">
                                         </div>
                                     </div>
                                     {% endfor %}
+                                </div>
+                                <div class="thumbnail-container"
+                                     style="text-align: center; margin-top: 10px; position: relative; font-size: 15px;">Vienos rožės kaina
+                                    <strong>1.99€</strong>
                                 </div>
 
                                 <!-- Add to Cart button moved inside the form -->
@@ -258,6 +265,38 @@
                     </div>
                 </div>
             </div>
+            <div class="mt-4">
+                <div class="card shadow-sm"
+                     style="background-color: #ECE1E2; width: 500px; height: auto; max-width: 100%; padding: 20px; border-radius: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
+                    <div class="card-body">
+                        <div class="col-md-12">
+                            <div class="thumbnail-container"
+                                 style="text-align: center; margin-top: 5px; position: relative;">Ilgaamžė, rankų darbo
+                                grožybė iš satino šilko, kuri niekada nevys. Kiekviena rožė kruopščiai pagaminta iš
+                                aukštos kokybės medžiagos, užtikrinant natūralią išvaizdą. Tinka bet kokiai progai:
+                                gimtadieniams, vestuvėms ar namų dekorui. Pastaba: Dekoracijos į puokštę neįeina. Jei
+                                norite įsigyti dekoracijų, galite padaryti tai paspaudę čia.
+                            </div>
+                            <!-- Added margin-bottom to create space between the two texts -->
+                            <div class="thumbnail-container"
+                                 style="text-align: center; margin-top: 100px; position: relative; font-style: italic; font-size: 13px;">
+                                Prašome nurodyti,
+                                kaip norėtumėte, kad būtų supakuota jūsų puokštė: pakavimo popieriaus spalvas ir
+                                kitus pageidavimus.
+                            </div>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="thumbnail-container"
+                                     style="text-align: center; margin-top: 20px; position: relative;">
+                                    {{ form.comment }}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
     </div>
 </div>

@@ -119,10 +119,10 @@ class Order(models.Model):
     decoration_qty = models.IntegerField(verbose_name='Decorations Quantity', default=0)
     wrappingpaper = models.ForeignKey('WrappingPaper', on_delete=models.CASCADE, null=True)
     wp_qty = models.IntegerField(verbose_name='Wrapping Paper Quantity', default=0)
-    order_comment = models.TextField(verbose_name='Order comment', blank=True, null=True)
+    comment = models.TextField(verbose_name='Order comment', blank=True, null=True)
 
     def __str__(self):
-        return f'{self.client} {self.roses} {self.roses_qty} {self.decoration} {self.decoration_qty} {self.wrappingpaper} {self.decoration_qty}'
+        return f'{self.client} {self.roses} {self.roses_qty} {self.decoration} {self.decoration_qty} {self.wrappingpaper} {self.decoration_qty} {self.comment}'
 
     def total(self):
         roses_price = self.roses.price * self.roses_qty

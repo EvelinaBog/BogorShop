@@ -6,6 +6,7 @@ from .models import UploadedImage
 from django.utils.decorators import decorator_from_middleware
 from django.middleware.cache import CacheMiddleware
 from django.views.decorators.cache import cache_control
+from .forms import OrderForm
 
 
 def index(request):
@@ -35,11 +36,22 @@ def index(request):
 @never_cache
 def flower(request):
     flowers_data = Products.objects.all()
-    first_product = flowers_data.first()  # Get the first product
+    first_product = flowers_data.first()
+    order_comment = Order.objects.all()
+
+    if request.method == 'POST':
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            form.save()  # Save the form data to the Order model
+            return redirect('flower')  # Redirect to prevent form re-submission
+    else:
+        form = OrderForm()
 
     context = {
         'flowers_data': flowers_data,
-        'first_product': first_product  # Pass the first product separately
+        'first_product': first_product,  # Pass the first product separately
+        'order_comment': order_comment,
+        'form': form,
     }
     return render(request, 'flowers.html', context)
 
@@ -94,7 +106,6 @@ def view_cart(request):
         'cart_items': cart_items,
         'total_price': round(total_price, 2)
     })
-
 
 
 @never_cache
