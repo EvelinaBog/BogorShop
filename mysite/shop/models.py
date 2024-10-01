@@ -119,10 +119,10 @@ class Order(models.Model):
     decoration_qty = models.IntegerField(verbose_name='Decorations Quantity', default=0)
     wrappingpaper = models.ForeignKey('WrappingPaper', on_delete=models.CASCADE, null=True)
     wp_qty = models.IntegerField(verbose_name='Wrapping Paper Quantity', default=0)
-    comment = models.TextField(verbose_name='Order comment', blank=True, null=True)
+    order_comment = models.ForeignKey('CartItem', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return f'{self.client} {self.roses} {self.roses_qty} {self.decoration} {self.decoration_qty} {self.wrappingpaper} {self.decoration_qty} {self.comment}'
+        return f'{self.client} {self.roses} {self.roses_qty} {self.decoration} {self.decoration_qty} {self.wrappingpaper} {self.decoration_qty} {self.order_comment}'
 
     def total(self):
         roses_price = self.roses.price * self.roses_qty
@@ -162,6 +162,7 @@ class Cart(models.Model):
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     session_key = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    comment = models.TextField(verbose_name='Order comment', blank=True, null=True)
 
     def __str__(self):
         return f'Cart {self.id}'

@@ -37,20 +37,11 @@ def index(request):
 def flower(request):
     flowers_data = Products.objects.all()
     first_product = flowers_data.first()
-    order_comment = Order.objects.all()
-
-    if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            form.save()  # Save the form data to the Order model
-            return redirect('flower')  # Redirect to prevent form re-submission
-    else:
-        form = OrderForm()
+    form = OrderForm()
 
     context = {
         'flowers_data': flowers_data,
-        'first_product': first_product,  # Pass the first product separately
-        'order_comment': order_comment,
+        'first_product': first_product,
         'form': form,
     }
     return render(request, 'flowers.html', context)
@@ -78,51 +69,72 @@ def get_or_create_cart(request):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @never_cache
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@never_cache
 def add_to_cart_bulk(request):
     if request.method == 'POST':
-        cart = get_or_create_cart(request)
+        cart = get_or_create_cart(request)  # Get the cart based on session or user
         product_ids = request.POST.getlist('products[]')
         quantities = request.POST.getlist('quantities[]')
 
+        # Process the products and quantities
         for product_id, quantity in zip(product_ids, quantities):
             product = get_object_or_404(Products, id=product_id)
             quantity = int(quantity)
 
+            # Create or update cart items
             cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
             cart_item.quantity += quantity
             cart_item.save()
 
-    return redirect('shop:view_cart')
+        return redirect('shop:view_cart')
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @never_cache
 def view_cart(request):
     cart = get_or_create_cart(request)
-    cart_items = cart.items.all()
-    total_price = sum(item.product.price * item.quantity for item in cart_items)
+    cart_items = cart.items.all()  # Get all cart items
+    total_price = 0
+    for item in cart_items:
+        item_total = item.product.price * item.quantity
+        total_price += item_total
 
     return render(request, 'cart.html', {
+        'cart': cart,  # Pass the cart object so the comment is available
         'cart_items': cart_items,
-        'total_price': round(total_price, 2)
+        'total_price': round(total_price, 2),  # Send the total price rounded to 2 decimal places
     })
 
 
 @never_cache
-def remove_from_cart(request, item_id):
-    if request.user.is_authenticated:
-        try:
-            cart_item = CartItem.objects.get(id=item_id)
-            cart_item.delete()
-        except CartItem.DoesNotExist:
-            pass
-    else:
-        cart = request.session.get('cart', {})
-        if str(item_id) in cart:
-            del cart[str(item_id)]
+def update_cart_comment(request):
+    cart = get_or_create_cart(request)  # Get or create the cart for the session or user
 
-        request.session['cart'] = cart
-        request.session.modified = True
+    if request.method == 'POST':
+        comment = request.POST.get('comment', '')  # Get the comment from the POST request
+        cart.comment = comment  # Update the comment for the cart
+        cart.save()  # Save the updated cart
+        print(f"Cart comment updated to: {cart.comment}")
+
+    return redirect('shop:view_cart')  # Redirect back to the cart page
+
+
+@never_cache
+def remove_from_cart(request, item_id):
+    cart = get_or_create_cart(request)
+
+    # Try to delete the specific cart item by its ID
+    try:
+        cart_item = CartItem.objects.get(id=item_id, cart=cart)
+        cart_item.delete()
+    except CartItem.DoesNotExist:
+        pass
+
+        # Manually check if the cart has no items left
+        if cart.items.count() == 0:  # If there are no items left in the cart
+            cart.comment = None  # Reset the comment
+            cart.save()  # Save the cart with the reset comment
 
     return redirect('shop:view_cart')
 

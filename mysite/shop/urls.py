@@ -13,6 +13,7 @@ urlpatterns = [
     path('cart/', views.view_cart, name='view_cart'),
     path('add/', views.add_to_cart_bulk, name='add_to_cart_bulk'),
     path('remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('cart/update-comment/', views.update_cart_comment, name='update_cart_comment'),
 
 ]
 if settings.DEBUG:
