@@ -10,17 +10,23 @@ from .validators import validate_image_size, validate_image_upload_size
 from PIL import Image
 from django.contrib.auth.models import User
 import datetime
+import io
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
 # Create your models here.
 
 
+from PIL import Image as PilImage
+import io
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
 def resize_image(image, size=(1080, 1080)):
     img = PilImage.open(image)
     original_size = img.size
 
-    # Convert to RGB if the image has an alpha channel
-    if img.mode == 'RGBA':
+    # Convert to RGB only if the image mode is not 'RGB' or 'RGBA'
+    if img.mode not in ('RGB', 'RGBA'):
         img = img.convert('RGB')
 
     img.thumbnail(size, PilImage.Resampling.LANCZOS)
@@ -28,18 +34,24 @@ def resize_image(image, size=(1080, 1080)):
 
     print(f"Original size: {original_size}, Resized size: {resized_size}")
 
-    img_io = io()
-    img.save(img_io, format='PNG', quality=50)  # Adjust quality as needed
+    img_io = io.BytesIO()  # Corrected to use BytesIO
+    img_format = 'PNG' if img.mode == 'RGBA' else 'JPEG'  # Preserve PNG for transparency
+
+    # Save as PNG if it's RGBA, otherwise save as JPEG
+    img.save(img_io, format=img_format, quality=85)  # Adjust quality for JPEG only
+
     img_io.seek(0)  # Rewind the file pointer
 
+    # Create an InMemoryUploadedFile using the correct format
     img_file = InMemoryUploadedFile(
         img_io,
         'ImageField',
         image.name,
-        'image/jpeg',
+        f'image/{img_format.lower()}',  # Ensure the correct MIME type
         img_io.getbuffer().nbytes,
         None
     )
+
     print(f"File size after resize: {img_file.size} bytes")
     return img_file
 
